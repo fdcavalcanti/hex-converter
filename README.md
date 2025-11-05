@@ -13,13 +13,22 @@ A simple C library for converting hexadecimal color codes to RGB values.
 
 ### Build the static library and test program
 
+For native (default) build:
+
 ```bash
 make
+```
+
+For RISC-V 32-bit cross-compilation:
+
+```bash
+make TARGET=riscv32
 ```
 
 This will create:
 - `libhex_to_rgb.a` - Static library
 - `test` - Test program
+- `main` - Example program to be called from terminal
 
 ### Clean build artifacts
 
@@ -27,11 +36,20 @@ This will create:
 make clean
 ```
 
-### Run tests
+### Build and run the main program
+
+The `main.c` program accepts a hex color from the command line. It can be manually built with:
 
 ```bash
-./test
+gcc -Wall -Wextra -std=c99 -Isrc main.c -L. -lhex_to_rgb -o main
 ```
+
+```bash
+./main "#FF5733"
+./main "00FF00"
+```
+
+Note: Cross-compiled binaries cannot be run directly on the host system.
 
 ## Usage
 
@@ -43,32 +61,27 @@ make clean
 
 ### Linking
 
-When compiling your program, link against the static library:
+When compiling your program, link against the static library. Include the `src/` directory for header files:
 
 ```bash
-gcc your_program.c -L. -lhex_to_rgb -o your_program
+gcc -Isrc your_program.c -L. -lhex_to_rgb -o your_program
 ```
 
-### Example
+### Example Program
 
-```c
-#include "hex_to_rgb.h"
-#include <stdio.h>
+The project includes a `main.c` example that takes a hex color from the command line:
 
-int main(void) {
-    int rgb[3];
-    int result;
+**Usage:**
+```bash
+./main "#FF5733"
+# Output:
+# Input: #FF5733
+# RGB: (255, 87, 51)
 
-    result = hex_to_rgb("#FF5733", rgb);
-    if (result == HEX_TO_RGB_SUCCESS) {
-        printf("RGB: (%d, %d, %d)\n", rgb[0], rgb[1], rgb[2]);
-        // Output: RGB: (255, 87, 51)
-    } else {
-        printf("Error: %d\n", result);
-    }
-
-    return 0;
-}
+./main "00FF00"
+# Output:
+# Input: 00FF00
+# RGB: (0, 255, 0)
 ```
 
 ## API Reference
@@ -110,18 +123,21 @@ All error codes are defined in `hex_to_rgb.h`:
 
 ```
 hex-converter/
-├── hex_to_rgb.h      # Header file with API and error codes
-├── hex_to_rgb.c      # Implementation
-├── test.c            # Test program
-├── Makefile          # Build configuration
-└── README.md         # This file
+├── src/
+│   ├── hex_to_rgb.h      # Header file with API and error codes
+│   └── hex_to_rgb.c      # Implementation
+├── main.c                 # Example program (command-line input)
+├── test.c                 # Test program
+├── Makefile               # Build configuration
+└── README.md              # This file
 ```
 
 ## Requirements
 
-- GCC compiler
+- GCC compiler (or `riscv-none-elf-gcc` for RISC-V builds)
 - Make
 - C99 standard support
+- For RISC-V builds: RISC-V GNU toolchain installed
 
 ## License
 
